@@ -69,3 +69,6 @@ tasks:
   dep-common:
     desc: get core dependency
     cmd: 'go get -u github.com/permguard/permguard-common@{{.CLI_ARGS}}'
+  dep-ztas:
+    desc: get ztas dependency
+    cmd: 'go get -u github.com/permguard/permguard-ztauthstar@{{.CLI_ARGS}}'
