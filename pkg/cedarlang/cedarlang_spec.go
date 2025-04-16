@@ -48,4 +48,3 @@ const (
 	// LanguageSchemaFileName defines the default filename for the schema definition associated with Cedar.
 	LanguageSchemaFileName = "schema.json"
 )
-
