@@ -18,22 +18,88 @@ package cedarlang
 
 import (
 	"errors"
+	"fmt"
 
-	azztasmanifests "github.com/permguard/permguard-ztauthstar/pkg/ztauthstar/authstarmodels/manifests"
+	azztasmfst "github.com/permguard/permguard-ztauthstar/pkg/ztauthstar/authstarmodels/manifests"
+)
+
+const (
+	partitionKey = "\\"
 )
 
 // BuildManifest builds the manifest.
-func BuildManifest(manifest *azztasmanifests.Manifest, template string) (*azztasmanifests.Manifest, error) {
+func BuildManifest(manifest *azztasmfst.Manifest, template string, engineName, engineVersion, engineDist string, schema bool) (*azztasmfst.Manifest, error) {
 	if manifest == nil {
 		return nil, errors.New("[cedar] manifest is nil")
 	}
+	if len(engineName) == 0 {
+		return nil, errors.New("[cedar] engine name is not valid")
+	}
+	if len(engineVersion) == 0 {
+		return nil, errors.New("[cedar] engine version is not valid")
+	}
+	if len(engineDist) == 0 {
+		return nil, errors.New("[cedar] engine distribution is not valid")
+	}
+	if manifest.Runtimes == nil {
+		manifest.Runtimes = map[string]azztasmfst.Runtime{}
+	}
+	if manifest.Partitions == nil {
+		manifest.Partitions = map[string]azztasmfst.Partition{}
+	}
+	runtimeKey := fmt.Sprintf("%s%s+", LanguageCedar, LanguageSyntaxVersion)
+	_, ok := manifest.Runtimes[runtimeKey]
+	if !ok {
+		runtime := azztasmfst.Runtime{
+			Engine: azztasmfst.Engine{
+				Name:         engineName,
+				Version:      engineVersion,
+				Distribution: engineDist,
+			},
+			Language: azztasmfst.Language{
+				Name:    LanguageCedar,
+				Version: LanguageSyntaxVersion,
+			},
+		}
+		manifest.Runtimes[runtimeKey] = runtime
+	}
+	partition, ok := manifest.Partitions[partitionKey]
+	if !ok {
+		partition = azztasmfst.Partition{
+			Runtime: runtimeKey,
+			Schema:  schema,
+		}
+		manifest.Partitions[partitionKey] = partition
+	}
+	partition.Runtime = partitionKey
 	return manifest, nil
 }
 
 // ValidateManifest validates the manifest.
-func ValidateManifest(manifest *azztasmanifests.Manifest) (bool, error) {
+func ValidateManifest(manifest *azztasmfst.Manifest) (bool, error) {
 	if manifest == nil {
 		return false, errors.New("[cedar] manifest is nil")
+	}
+	if manifest.Runtimes == nil {
+		return false, errors.New("[cedar] manifest has invalid runtimes")
+	}
+	if manifest.Partitions == nil {
+		return false, errors.New("[cedar] manifest has invalid partitions")
+	}
+	if manifest.Partitions == nil {
+		manifest.Partitions = map[string]azztasmfst.Partition{}
+	}
+	runtimeKey := fmt.Sprintf("%s%s+", LanguageCedar, LanguageSyntaxVersion)
+	_, ok := manifest.Runtimes[runtimeKey]
+	if !ok {
+		return false, errors.New("[cedar] manifest is missing cedar runtime")
+	}
+	partition, ok := manifest.Partitions[partitionKey]
+	if !ok {
+		return false, errors.New("[cedar] manifest is missing the root partition")
+	}
+	if partition.Runtime != runtimeKey {
+		return false, errors.New("[cedar] manifest has a not valid runtime")
 	}
 	return true, nil
 }
