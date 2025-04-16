@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	partitionKey = "\\"
+	partitionKey = "/"
 )
 
 // BuildManifest builds the manifest.
