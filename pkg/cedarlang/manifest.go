@@ -58,7 +58,7 @@ func BuildManifest(manifest *azztasmfst.Manifest, template string, engineName, e
 			},
 			Language: azztasmfst.Language{
 				Name:    LanguageCedar,
-				Version: LanguageSyntaxVersion,
+				Version: fmt.Sprintf("%s+", LanguageSyntaxVersion),
 			},
 		}
 		manifest.Runtimes[runtimeKey] = runtime
