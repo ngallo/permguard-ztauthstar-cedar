@@ -47,7 +47,7 @@ func BuildManifest(manifest *azztasmfst.Manifest, template string, engineName, e
 	if manifest.Partitions == nil {
 		manifest.Partitions = map[string]azztasmfst.Partition{}
 	}
-	runtimeKey := fmt.Sprintf("%s%s+", LanguageCedar, LanguageSyntaxVersion)
+	runtimeKey := fmt.Sprintf("%s[%s+]", LanguageCedar, LanguageSyntaxVersion)
 	_, ok := manifest.Runtimes[runtimeKey]
 	if !ok {
 		runtime := azztasmfst.Runtime{
@@ -89,7 +89,7 @@ func ValidateManifest(manifest *azztasmfst.Manifest) (bool, error) {
 	if manifest.Partitions == nil {
 		manifest.Partitions = map[string]azztasmfst.Partition{}
 	}
-	runtimeKey := fmt.Sprintf("%s%s+", LanguageCedar, LanguageSyntaxVersion)
+	runtimeKey := fmt.Sprintf("%s[%s+]", LanguageCedar, LanguageSyntaxVersion)
 	_, ok := manifest.Runtimes[runtimeKey]
 	if !ok {
 		return false, errors.New("[cedar] manifest is missing cedar runtime")
